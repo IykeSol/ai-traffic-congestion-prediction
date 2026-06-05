@@ -1,8 +1,3 @@
-# AI Traffic Congestion Predictor
-
-An end-to-end Machine Learning and NLP system to predict urban traffic congestion levels.
-Built for the Federal University of Technology, Owerri.
-
 ---
 title: AI Traffic Congestion Predictor
 emoji: 🚦
@@ -11,6 +6,11 @@ colorTo: indigo
 sdk: docker
 pinned: false
 ---
+
+# AI Traffic Congestion Predictor
+
+An end-to-end Machine Learning and NLP system to predict urban traffic congestion levels.
+Built for the Federal University of Technology, Owerri.
 
 ## Features
 - **Synthetic Data Engine:** Generates realistic urban traffic data with Gaussian noise, categorical flip noise, and temporal BPR (Bureau of Public Roads) speed-flow patterns.
