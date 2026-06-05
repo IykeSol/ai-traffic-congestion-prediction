@@ -1,0 +1,61 @@
+{
+  "accuracy": 0.7907,
+  "f1_macro": 0.5686,
+  "f1_weighted": 0.7618,
+  "per_class": {
+    "high": {
+      "precision": 0.3897,
+      "recall": 0.2296,
+      "f1-score": 0.289,
+      "support": 331.0
+    },
+    "low": {
+      "precision": 0.8,
+      "recall": 0.9235,
+      "f1-score": 0.8573,
+      "support": 797.0
+    },
+    "moderate": {
+      "precision": 0.3219,
+      "recall": 0.1655,
+      "f1-score": 0.2186,
+      "support": 284.0
+    },
+    "severe": {
+      "precision": 0.87,
+      "recall": 0.9528,
+      "f1-score": 0.9095,
+      "support": 1588.0
+    }
+  },
+  "feature_importances": {
+    "road_capacity_utilization": 0.21217717230319977,
+    "hour": 0.09757838398218155,
+    "incident_reported": 0.08029003441333771,
+    "is_weekend": 0.07034409046173096,
+    "weather_condition": 0.057935114949941635,
+    "hour_cos": 0.0578596256673336,
+    "hour_sin": 0.04083229973912239,
+    "day_cos": 0.03667808696627617,
+    "public_event_nearby": 0.034980472177267075,
+    "school_zone": 0.0331357941031456,
+    "construction_zone": 0.030882082879543304,
+    "month_cos": 0.02861371822655201,
+    "vehicle_count": 0.02542177401483059,
+    "day_sin": 0.02539435401558876,
+    "road_type": 0.024180928245186806,
+    "average_speed_kmh": 0.023115845397114754,
+    "day_of_week": 0.02299978956580162,
+    "month_sin": 0.022995175793766975,
+    "city_zone": 0.020979445427656174,
+    "month": 0.01887020654976368,
+    "signal_cycle_time": 0.018405886366963387,
+    "temperature_c": 0.016329752281308174
+  },
+  "classes": [
+    "high",
+    "low",
+    "moderate",
+    "severe"
+  ]
+}

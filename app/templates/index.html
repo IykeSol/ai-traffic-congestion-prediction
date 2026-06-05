@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Traffic Congestion Predictor | Intelligent Urban Mobility</title>
+  <meta name="description" content="Advanced AI-powered traffic congestion prediction system using ensemble machine learning and natural language processing for smarter urban mobility decisions." />
+  <meta name="keywords" content="traffic prediction, AI, machine learning, congestion, urban mobility, smart city" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- ─── Navigation ─────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">TrafficAI</span>
+      </div>
+      <div class="nav-links">
+        <a href="#predictor"  class="nav-link" id="nav-predictor">Predictor</a>
+        <a href="#nlp"        class="nav-link" id="nav-nlp">NLP Analysis</a>
+        <a href="#dashboard"  class="nav-link" id="nav-dashboard">Dashboard</a>
+        <a href="#history"    class="nav-link" id="nav-history">History</a>
+      </div>
+      <div class="nav-status" id="nav-status">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">Connecting...</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ───────────────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge">Powered by XGBoost + Gemini AI</div>
+      <h1 class="hero-title">
+        Predict Urban Traffic<br />
+        <span class="gradient-text">Before It Stops You</span>
+      </h1>
+      <p class="hero-subtitle">
+        An ensemble machine learning system that analyses road conditions, weather, temporal patterns,
+        and infrastructure data to forecast congestion levels with clinical precision.
+      </p>
+      <div class="hero-stats" id="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-value" id="stat-accuracy">--</span>
+          <span class="stat-label">Model Accuracy</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value" id="stat-f1">--</span>
+          <span class="stat-label">F1 Score</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value">4</span>
+          <span class="stat-label">Congestion Classes</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value">22</span>
+          <span class="stat-label">Input Features</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="#predictor" class="btn btn-primary" id="hero-cta">Run a Prediction</a>
+        <a href="#dashboard" class="btn btn-ghost">View Model Stats</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="road-animation" id="roadAnimation">
+        <div class="road-lane lane-1"></div>
+        <div class="road-lane lane-2"></div>
+        <div class="road-lane lane-3"></div>
+        <div class="road-divider"></div>
+        <div class="road-car car-1"></div>
+        <div class="road-car car-2"></div>
+        <div class="road-car car-3"></div>
+        <div class="road-car car-4"></div>
+        <div class="road-car car-5"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Congestion Level Legend ────────────────────────── -->
+  <section class="legend-bar">
+    <div class="container">
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="legend-dot dot-low"></div>
+          <div>
+            <span class="legend-label">Low</span>
+            <span class="legend-desc">Free-flowing traffic, minimal delay</span>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-moderate"></div>
+          <div>
+            <span class="legend-label">Moderate</span>
+            <span class="legend-desc">Minor slowdowns, 10-15 min delay</span>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-high"></div>
+          <div>
+            <span class="legend-label">High</span>
+            <span class="legend-desc">Significant congestion, plan alternate route</span>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-severe"></div>
+          <div>
+            <span class="legend-label">Severe</span>
+            <span class="legend-desc">Critical gridlock, postpone travel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Structured Predictor ───────────────────────────── -->
+  <section class="section" id="predictor">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Machine Learning Inference</span>
+        <h2 class="section-title">Structured Traffic Predictor</h2>
+        <p class="section-desc">Input precise road and environmental conditions to receive an ML-powered congestion forecast.</p>
+      </div>
+
+      <div class="predictor-grid">
+        <!-- Form -->
+        <div class="card form-card">
+          <form id="predictorForm" autocomplete="off">
+
+            <div class="form-section-label">Temporal Context</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hour">Hour of Day</label>
+                <div class="input-wrapper">
+                  <input type="number" id="hour" name="hour" min="0" max="23" value="8" required />
+                  <span class="input-unit">hr</span>
+                </div>
+                <span class="field-hint">0 = midnight, 23 = 11 PM</span>
+              </div>
+              <div class="form-group">
+                <label for="day_of_week">Day of Week</label>
+                <div class="input-wrapper">
+                  <select id="day_of_week" name="day_of_week">
+                    <option value="0">Monday</option>
+                    <option value="1">Tuesday</option>
+                    <option value="2">Wednesday</option>
+                    <option value="3">Thursday</option>
+                    <option value="4">Friday</option>
+                    <option value="5">Saturday</option>
+                    <option value="6">Sunday</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="month">Month</label>
+                <div class="input-wrapper">
+                  <select id="month" name="month">
+                    <option value="1">January</option><option value="2">February</option>
+                    <option value="3">March</option><option value="4">April</option>
+                    <option value="5">May</option><option value="6" selected>June</option>
+                    <option value="7">July</option><option value="8">August</option>
+                    <option value="9">September</option><option value="10">October</option>
+                    <option value="11">November</option><option value="12">December</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section-label">Infrastructure</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="road_type">Road Type</label>
+                <div class="input-wrapper">
+                  <select id="road_type" name="road_type">
+                    <option value="highway">Highway</option>
+                    <option value="arterial" selected>Arterial</option>
+                    <option value="local">Local Road</option>
+                    <option value="expressway">Expressway</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="city_zone">City Zone</label>
+                <div class="input-wrapper">
+                  <select id="city_zone" name="city_zone">
+                    <option value="CBD" selected>CBD</option>
+                    <option value="residential">Residential</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="suburban">Suburban</option>
+                    <option value="airport">Airport</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="signal_cycle_time">Signal Cycle Time</label>
+                <div class="input-wrapper">
+                  <input type="number" id="signal_cycle_time" name="signal_cycle_time" min="20" max="300" value="90" />
+                  <span class="input-unit">sec</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section-label">Traffic Conditions</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vehicle_count">Vehicle Count</label>
+                <div class="input-wrapper">
+                  <input type="number" id="vehicle_count" name="vehicle_count" min="0" value="1800" />
+                  <span class="input-unit">veh/hr</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="average_speed_kmh">Average Speed</label>
+                <div class="input-wrapper">
+                  <input type="number" id="average_speed_kmh" name="average_speed_kmh" min="0" max="150" value="45" />
+                  <span class="input-unit">km/h</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="road_capacity_utilization">Capacity Utilization</label>
+                <div class="input-wrapper">
+                  <input type="number" id="road_capacity_utilization" name="road_capacity_utilization"
+                         min="0" max="1" step="0.01" value="0.65" />
+                  <span class="input-unit">ratio</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section-label">Environmental</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="weather_condition">Weather</label>
+                <div class="input-wrapper">
+                  <select id="weather_condition" name="weather_condition">
+                    <option value="clear" selected>Clear</option>
+                    <option value="rain">Rain</option>
+                    <option value="fog">Fog</option>
+                    <option value="snow">Snow</option>
+                    <option value="storm">Storm</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="temperature_c">Temperature</label>
+                <div class="input-wrapper">
+                  <input type="number" id="temperature_c" name="temperature_c" value="25" />
+                  <span class="input-unit">°C</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section-label">Event Flags</div>
+            <div class="toggle-grid">
+              <label class="toggle-item" id="toggle-incident">
+                <input type="checkbox" id="incident_reported" name="incident_reported" value="1" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">Incident Reported</span>
+              </label>
+              <label class="toggle-item" id="toggle-school">
+                <input type="checkbox" id="school_zone" name="school_zone" value="1" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">School Zone</span>
+              </label>
+              <label class="toggle-item" id="toggle-construction">
+                <input type="checkbox" id="construction_zone" name="construction_zone" value="1" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">Construction Zone</span>
+              </label>
+              <label class="toggle-item" id="toggle-event">
+                <input type="checkbox" id="public_event_nearby" name="public_event_nearby" value="1" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">Public Event Nearby</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="predictBtn">
+              <span class="btn-text">Predict Congestion Level</span>
+              <div class="btn-spinner hidden" id="predictSpinner"></div>
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="result-panel" id="resultPanel">
+          <div class="result-placeholder" id="resultPlaceholder">
+            <div class="placeholder-icon">
+              <svg viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/>
+                <path d="M20 32h24M32 20v24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p>Fill in the form and submit to see your prediction results here.</p>
+          </div>
+
+          <div class="result-content hidden" id="resultContent">
+            <div class="result-level-badge" id="resultBadge">
+              <div class="level-indicator" id="levelIndicator"></div>
+              <span class="level-text" id="levelText">--</span>
+            </div>
+            <div class="confidence-display">
+              <span class="conf-label">Top Confidence</span>
+              <span class="conf-value" id="confValue">--%</span>
+            </div>
+
+            <div class="confidence-bars" id="confidenceBars"></div>
+
+            <div class="result-recommendation" id="resultRecommendation"></div>
+
+            <div class="result-meta" id="resultMeta"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── NLP Predictor ──────────────────────────────────── -->
+  <section class="section section-dark" id="nlp">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Gemini AI + ML Fusion</span>
+        <h2 class="section-title">Natural Language Traffic Analysis</h2>
+        <p class="section-desc">
+          Describe your commute in plain language. Gemini extracts the relevant features,
+          the ML model predicts congestion, and Gemini generates a professional analysis.
+        </p>
+      </div>
+
+      <div class="nlp-container">
+        <div class="nlp-input-area">
+          <div class="nlp-examples">
+            <span class="examples-label">Try an example:</span>
+            <button class="example-chip" data-text="It is Monday morning rush hour at 8am on the arterial road near the CBD. It is raining and the vehicles are crawling at around 20 km/h. There seems to be an accident ahead.">Morning rush + rain + incident</button>
+            <button class="example-chip" data-text="Friday evening at 6pm on the highway heading out of the city. Weather is clear and it is summer. Traffic is moderate, nothing unusual.">Friday highway evening</button>
+            <button class="example-chip" data-text="Sunday afternoon on a local residential road. No events, clear skies, temperature around 22 degrees. Very few cars.">Quiet Sunday afternoon</button>
+          </div>
+
+          <div class="nlp-form" id="nlpForm">
+            <textarea
+              id="nlpInput"
+              placeholder="Describe the road conditions, time, weather, and any incidents in natural language..."
+              rows="5"
+            ></textarea>
+            <button type="button" class="btn btn-primary" id="nlpSubmit">
+              <span class="btn-text">Analyse with AI</span>
+              <div class="btn-spinner hidden" id="nlpSpinner"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="nlp-result hidden" id="nlpResult">
+          <div class="nlp-result-header">
+            <div class="nlp-prediction-badge" id="nlpBadge"></div>
+            <div class="nlp-confidence" id="nlpConfidence"></div>
+          </div>
+
+          <div class="nlp-extracted" id="nlpExtracted">
+            <div class="extracted-label">Features extracted by Gemini:</div>
+            <div class="extracted-chips" id="extractedChips"></div>
+          </div>
+
+          <div class="nlp-summary-block">
+            <div class="summary-label">AI Analysis</div>
+            <p class="nlp-summary-text" id="nlpSummaryText"></p>
+          </div>
+
+          <div class="nlp-conf-bars" id="nlpConfBars"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Dashboard ──────────────────────────────────────── -->
+  <section class="section" id="dashboard">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Model Intelligence</span>
+        <h2 class="section-title">Model Performance Dashboard</h2>
+        <p class="section-desc">Real-time metrics from the trained XGBoost + RandomForest ensemble model.</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="metric-card" id="card-accuracy">
+          <div class="metric-icon icon-accuracy">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 12L10.5 15L16.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value" id="dash-accuracy">--%</span>
+            <span class="metric-label">Model Accuracy</span>
+          </div>
+          <div class="metric-bar-wrap"><div class="metric-bar" id="bar-accuracy"></div></div>
+        </div>
+
+        <div class="metric-card" id="card-f1macro">
+          <div class="metric-icon icon-f1">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 16l4-6 4 4 4-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value" id="dash-f1macro">--%</span>
+            <span class="metric-label">F1 Score (Macro)</span>
+          </div>
+          <div class="metric-bar-wrap"><div class="metric-bar" id="bar-f1macro"></div></div>
+        </div>
+
+        <div class="metric-card" id="card-f1weighted">
+          <div class="metric-icon icon-f1w">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value" id="dash-f1weighted">--%</span>
+            <span class="metric-label">F1 Score (Weighted)</span>
+          </div>
+          <div class="metric-bar-wrap"><div class="metric-bar" id="bar-f1weighted"></div></div>
+        </div>
+
+        <div class="metric-card" id="card-status">
+          <div class="metric-icon icon-status">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value" id="dash-status">--</span>
+            <span class="metric-label">System Status</span>
+          </div>
+          <div class="metric-bar-wrap"><div class="metric-bar bar-status" id="bar-status"></div></div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Feature Importance (Top 10)</div>
+          <div class="chart-wrap">
+            <canvas id="featureImportanceChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Per-Class F1 Scores</div>
+          <div class="chart-wrap">
+            <canvas id="perClassChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Prediction History ─────────────────────────────── -->
+  <section class="section section-dark" id="history">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Session Log</span>
+        <h2 class="section-title">Prediction History</h2>
+        <p class="section-desc">All predictions made in this session are logged here for review.</p>
+      </div>
+
+      <div class="history-container">
+        <div class="history-controls">
+          <button class="btn btn-ghost btn-sm" id="refreshHistory">Refresh</button>
+          <span class="history-count" id="historyCount">0 predictions</span>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Source</th>
+                <th>Road Type</th>
+                <th>Weather</th>
+                <th>Hour</th>
+                <th>Prediction</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr class="history-empty">
+                <td colspan="7">No predictions yet. Run the predictor above to get started.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="brand-name">TrafficAI</span>
+          <p>AI-powered traffic congestion prediction using ensemble machine learning and Gemini NLP.</p>
+        </div>
+        <div class="footer-meta">
+          <div class="tech-stack">
+            <span class="tech-badge">XGBoost</span>
+            <span class="tech-badge">RandomForest</span>
+            <span class="tech-badge">Optuna</span>
+            <span class="tech-badge">Gemini AI</span>
+            <span class="tech-badge">Flask</span>
+          </div>
+          <p class="footer-note">Built for academic research. Federal University of Technology, Owerri.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# Core ML
+numpy
+pandas
+scikit-learn
+xgboost
+imbalanced-learn
+optuna
+joblib
+
+# Data / Stats
+scipy
+
+# Terminal UI
+rich
+tqdm
+
+# Web Backend
+flask
+flask-cors
+gunicorn
+
+# Gemini AI
+google-generativeai
+
+# Plotting (for terminal reports)
+matplotlib
+seaborn
+
+# Environment
+python-dotenv
